@@ -1,0 +1,103 @@
+<html>
+  <head>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+      google.charts.load('current', {'packages':['bar']});
+
+      const global = {};
+
+      function load() {
+        const data = JSON.parse(document.getElementById('data').innerText);
+        global.data = data;
+
+        const patterns = Array.from(new Set(data["revisions"].map((revision) => revision["patterns"]).flat().map((pattern) => pattern.pattern)));
+        const patternElement = document.getElementById('pattern');
+        for (const pattern of patterns) {
+          const optionElement = document.createElement('option');
+          optionElement.innerText = pattern;
+          optionElement.value = pattern;
+          patternElement.append(optionElement);
+        }
+
+        drawChart();
+      }
+
+      function drawChart() {
+        // 選択中のパターンを取得
+        const selectedPattern = document.getElementById('pattern').value;
+
+        // オーサーの並び順を決めるため、一度全リビジョンをチェックしオーサー毎のコード数合計を求める
+        const authors = {};
+        for (const { patterns } of global.data["revisions"]) {
+          const pattern = patterns.find(({pattern}) => pattern === selectedPattern);
+          if (pattern) {
+            const { counter } = pattern;
+            for (const [author, lineCount] of Object.entries(counter)) {
+              authors[author] = lineCount + (authors[author] || 0);
+            }
+          }
+        }
+
+        // 行数 > 名前 の順序で並び替えたオーサー名配列を作る
+        const authorsRank = Object.entries(authors).sort(([lAuthor, lLineCount], [rAuthor, rLineCount]) => {
+          if (lLineCount === rLineCount) {
+            return lAuthor > rAuthor ? 1 : -1;
+          } else {
+            return lLineCount < rLineCount ? 1 : -1;
+          }
+        }).map(([author]) => author);
+
+        // 描画データを作成
+        const drawHeader = ["Revision"].concat(authorsRank);
+        const drawData = [];
+        for (const { revision, patterns } of global.data["revisions"]) {
+          const pattern = patterns.find(({pattern}) => pattern === selectedPattern);
+          if (pattern) {
+            const { counter } = pattern;
+
+            const lineData = [revision];
+            for (const author of authorsRank) {
+              lineData.push(counter[author] || 0);
+            }
+
+            drawData.push(lineData);
+          }
+        }
+        console.log(drawData);
+
+        const data = google.visualization.arrayToDataTable([
+          drawHeader,
+          ...drawData,
+        ]);
+
+        const options = {
+          chart: {
+            title : 'Line Count'
+          },
+          width: 1600,
+          height: 1200,
+          legend: { position: 'top', maxLines: 3 },
+          bar: { groupWidth: '75%' },
+          isStacked: true
+        };
+
+        const chart = new google.charts.Bar(document.getElementById('chart'));
+
+        chart.draw(data, google.charts.Bar.convertOptions(options));
+      }
+    </script>
+  </head>
+  <body onload="load()">
+    <div>
+      Respository: {{ name }}
+    </div>
+    <div>
+      Pattern: <select id="pattern" onchange="drawChart()"></select>
+    </div>
+    <br />
+    <div id="chart"></div>
+    <div id="data" style="display: none;">
+      {{ data|tojson }}
+    </div>
+  </body>
+</html>
