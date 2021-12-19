@@ -48,7 +48,7 @@
         }).map(([author]) => author);
 
         // 描画データを作成
-        const drawHeader = ["Revision"].concat(authorsRank);
+        const drawHeader = ["Revision"].concat(authorsRank.map((rank) => [rank, {role: 'annotation'}]).flat());
         const drawData = [];
         for (const { revision, patterns } of global.data["revisions"]) {
           const pattern = patterns.find(({pattern}) => pattern === selectedPattern);
@@ -58,7 +58,10 @@
             const lineData = [revision];
             for (const author of authorsRank) {
               lineData.push(counter[author] || 0);
+              lineData.push(author);
             }
+
+            console.log(lineData);
 
             drawData.push(lineData);
           }
@@ -72,13 +75,18 @@
 
         const options = {
           chart: {
-            title : 'Line Count'
+            title : 'Lines'
           },
-          width: 1600,
-          height: 1200,
+          width: '100%',
+          height: '100%',
           legend: { position: 'top', maxLines: 3 },
           bar: { groupWidth: '75%' },
-          isStacked: true
+          isStacked: true,
+          series: authorsRank.reduce((ret, current, index) => {
+            const colors = ["pink", "peachpuff", "lightyellow", "palegreen", "lightcyan", "powderblue", "thistle"]
+            ret[index] = {color: colors[index % colors.length]};
+            return ret;
+          }, {})
         };
 
         const chart = new google.charts.Bar(document.getElementById('chart'));
@@ -87,15 +95,12 @@
       }
     </script>
   </head>
-  <body onload="load()">
+  <body onload="load()" style="height: 100%;" onresize="drawChart()">
     <div>
-      Respository: {{ name }}
-    </div>
-    <div>
-      Pattern: <select id="pattern" onchange="drawChart()"></select>
+      Pattern: <select id="pattern" onchange="drawChart()"></select>&nbsp;Name: {{ name }}
     </div>
     <br />
-    <div id="chart"></div>
+    <div id="chart" style="height: 90%;"></div>
     <div id="data" style="display: none;">
       {{ data|tojson }}
     </div>
