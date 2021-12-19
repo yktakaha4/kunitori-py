@@ -30,13 +30,13 @@ def main():
         f"{git_directory_path=}, {filters=}, {base_date=}, {revision_interval=}"
     )
 
-    revisions = [
+    revisions = list(reversed([
         search_revision(
             git_directory_path=git_directory_path,
             target=(base_date - relativedelta(months=before_month)),
         )
         for before_month in range(revision_interval)
-    ]
+    ]))
 
     logger.info(f"{revisions=}")
 
