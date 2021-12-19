@@ -1,7 +1,8 @@
 import re
+from argparse import ArgumentParser
 from datetime import datetime
 from logging import getLogger
-from os import environ, getcwd
+from os import getcwd
 from os.path import basename, join
 
 from dateutil.relativedelta import relativedelta
@@ -14,10 +15,16 @@ logger = getLogger(__name__)
 
 
 def main():
-    git_directory_path = environ["GIT_DIRECTORY_PATH"]
+    argument_parser = ArgumentParser()
+    argument_parser.add_argument('git_directory_path')
+    argument_parser.add_argument('-i', '--revision_interval', default=12, type=int)
+
+    args = argument_parser.parse_args()
+
+    git_directory_path = args.git_directory_path
     filters = [re.compile(r"\.py$"), re.compile(r"\.(ts|vue)$")]
     base_date = datetime.now()
-    revision_interval = 12
+    revision_interval = args.revision_interval
 
     logger.info(
         f"{git_directory_path=}, {filters=}, {base_date=}, {revision_interval=}"
