@@ -1,8 +1,11 @@
 from collections import Counter, OrderedDict
+from logging import getLogger
 from re import Pattern
 from typing import List
 
 import git
+
+logger = getLogger(__name__)
 
 
 def aggregate_author_count(
@@ -10,6 +13,8 @@ def aggregate_author_count(
     filters: List[Pattern[str]],
     revision: str = "HEAD",
 ):
+    logger.info(f"{git_directory_path=}, {filters=}, {revision=}")
+
     author_count_per_filters: OrderedDict[Pattern[str], Counter] = OrderedDict(
         [(f, Counter()) for f in filters]
     )
@@ -23,10 +28,10 @@ def aggregate_author_count(
 
         matched_filters = [f for f in filters if f.search(abspath)]
         if not matched_filters:
-            print(f"skip: {abspath}")
+            logger.debug(f"skip: {abspath}")
             continue
 
-        print(f"read: {abspath}")
+        logger.debug(f"read: {abspath}")
 
         author_counter = Counter(
             [

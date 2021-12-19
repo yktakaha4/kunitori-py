@@ -1,5 +1,6 @@
 from collections import Counter
 from datetime import datetime
+from logging import getLogger
 from os.path import dirname, join
 from re import Pattern
 from typing import List, OrderedDict, Tuple
@@ -9,13 +10,15 @@ from jinja2 import Environment, FileSystemLoader
 template_directory_path = join(dirname(__file__), "templates")
 jinja_env = Environment(loader=FileSystemLoader(template_directory_path))
 
+logger = getLogger(__name__)
+
 
 def visualize(
     export_directory_path: str,
     name: str,
     data: List[Tuple[str, OrderedDict[Pattern[str], Counter]]],
 ):
-
+    logger.info(f"{export_directory_path=}, {name=}, {data=}")
     template = jinja_env.get_template("chart.j2")
     template_data = {
         "revisions": [
