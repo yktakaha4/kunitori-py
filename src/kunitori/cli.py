@@ -38,6 +38,8 @@ def main():
         for before_month in range(revision_interval)
     ]
 
+    logger.info(f'{revisions=}')
+
     export_directory_path = join(getcwd(), "out")
     name = basename(git_directory_path)
     data = [
