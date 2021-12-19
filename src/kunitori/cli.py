@@ -16,8 +16,8 @@ logger = getLogger(__name__)
 
 def main():
     argument_parser = ArgumentParser()
-    argument_parser.add_argument('git_directory_path')
-    argument_parser.add_argument('-i', '--revision_interval', default=12, type=int)
+    argument_parser.add_argument("git_directory_path")
+    argument_parser.add_argument("-i", "--revision_interval", default=12, type=int)
 
     args = argument_parser.parse_args()
 
@@ -38,7 +38,7 @@ def main():
         for before_month in range(revision_interval)
     ]
 
-    logger.info(f'{revisions=}')
+    logger.info(f"{revisions=}")
 
     export_directory_path = join(getcwd(), "out")
     name = basename(git_directory_path)
