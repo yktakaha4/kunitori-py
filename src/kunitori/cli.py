@@ -22,7 +22,11 @@ def main():
     args = argument_parser.parse_args()
 
     git_directory_path = args.git_directory_path
-    filters = [re.compile(r"\.py$"), re.compile(r"\.(ts|vue)$"), re.compile(r"test.*\.(py|ts|vue)$")]
+    filters = [
+        re.compile(r"\.py$"),
+        re.compile(r"\.(ts|vue)$"),
+        re.compile(r"test.*\.(py|ts|vue)$"),
+    ]
     base_date = datetime.now()
     revision_interval = args.revision_interval
 
@@ -30,13 +34,17 @@ def main():
         f"{git_directory_path=}, {filters=}, {base_date=}, {revision_interval=}"
     )
 
-    revisions = list(reversed([
-        search_revision(
-            git_directory_path=git_directory_path,
-            target=(base_date - relativedelta(months=before_month)),
+    revisions = list(
+        reversed(
+            [
+                search_revision(
+                    git_directory_path=git_directory_path,
+                    target=(base_date - relativedelta(months=before_month)),
+                )
+                for before_month in range(revision_interval)
+            ]
         )
-        for before_month in range(revision_interval)
-    ]))
+    )
 
     logger.info(f"{revisions=}")
 
