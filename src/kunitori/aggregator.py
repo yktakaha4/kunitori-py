@@ -1,3 +1,5 @@
+from binascii import Error
+import itertools
 from collections import Counter, OrderedDict
 from logging import getLogger
 from re import Pattern
@@ -34,10 +36,12 @@ def aggregate_author_count(
         logger.debug(f"read: {abspath}")
 
         author_counter = Counter(
-            [
-                blame_entry[0].author.name
-                for blame_entry in repo.blame(rev=revision, file=abspath)
-            ]
+            itertools.chain.from_iterable(
+                [
+                    [blame_entry.author.name] * len(lines)
+                    for blame_entry, lines in repo.blame(rev=revision, file=abspath)
+                ]
+            )
         )
 
         for matched_filter in matched_filters:
