@@ -33,7 +33,7 @@ def visualize(
         ]
     }
 
-    file_name = f'chart_{datetime.now().strftime("%Y%m%d_%H%M%S")}.html'
+    file_name = f'{name}_{datetime.now().strftime("%Y%m%d_%H%M%S")}.html'
     with open(join(export_directory_path, file_name), mode="w") as f:
         f.write(
             template.render(

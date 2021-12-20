@@ -26,15 +26,14 @@
         // 選択中のパターンを取得
         const selectedPattern = document.getElementById('pattern').value;
 
-        // オーサーの並び順を決めるため、一度全リビジョンをチェックしオーサー毎のコード数合計を求める
+        // オーサーの並び順を決めるため、右端のリビジョンをチェックしオーサー毎のコード数合計を求める
         const authors = {};
-        for (const { patterns } of global.data["revisions"]) {
-          const pattern = patterns.find(({pattern}) => pattern === selectedPattern);
-          if (pattern) {
-            const { counter } = pattern;
-            for (const [author, lineCount] of Object.entries(counter)) {
-              authors[author] = lineCount + (authors[author] || 0);
-            }
+        const { patterns } = global.data["revisions"][global.data["revisions"].length - 1]
+        const pattern = patterns.find(({pattern}) => pattern === selectedPattern);
+        if (pattern) {
+          const { counter } = pattern;
+          for (const [author, lineCount] of Object.entries(counter)) {
+            authors[author] = lineCount + (authors[author] || 0);
           }
         }
 
