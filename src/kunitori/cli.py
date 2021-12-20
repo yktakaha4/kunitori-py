@@ -22,7 +22,7 @@ def main():
     args = argument_parser.parse_args()
 
     git_directory_path = args.git_directory_path
-    filters = [re.compile(r"\.py$"), re.compile(r"\.(ts|vue)$")]
+    filters = [re.compile(r"\.py$"), re.compile(r"\.(ts|vue)$"), re.compile(r"test.*\.(py|ts|vue)$")]
     base_date = datetime.now()
     revision_interval = args.revision_interval
 
